@@ -90,7 +90,6 @@
             background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px);
             background-size: 100% 4px;
         }
-        /* --------------------------------- */
 
         /* Custom gritty scrollbar */
         ::-webkit-scrollbar { width: 8px; }
@@ -653,7 +652,7 @@
     <!-- FIREBASE SDK & APPLICATION LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Global Application State attached to window for inline HTML access
@@ -689,30 +688,35 @@
             }, 4000);
         };
 
-        // Initialize Firebase
+        // --- Initialize YOUR Specific Firebase Backend ---
         const firebaseConfig = {
-  apiKey: "AIzaSyBak6wVW6rs2I5MvldwLFRHdmf5ZYKKrns",
-  authDomain: "sparta-b9257.firebaseapp.com",
-  projectId: "sparta-b9257",
-  storageBucket: "sparta-b9257.firebasestorage.app",
-  messagingSenderId: "191341294228",
-  appId: "1:191341294228:web:671340323a6b596879fa81",
-  measurementId: "G-JPXK48X6TH"
-};
-
+            apiKey: "AIzaSyBak6wVW6rs2I5MvldwLFRHdmf5ZYKKrns",
+            authDomain: "sparta-b9257.firebaseapp.com",
+            projectId: "sparta-b9257",
+            storageBucket: "sparta-b9257.firebasestorage.app",
+            messagingSenderId: "191341294228",
+            appId: "1:191341294228:web:671340323a6b596879fa81",
+            measurementId: "G-JPXK48X6TH"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        // Using your projectId as the root data folder
+        const appId = 'sparta-b9257'; 
+        let currentUserUid = null;
+        let dbRequests = [];
 
         // Authenticate User
         const initAuth = async () => {
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                // Connecting normally via anonymous login for your live site.
+                await signInAnonymously(auth);
             } catch (err) {
                 console.error("Auth init failed", err);
                 document.getElementById('auth-status').innerText = "Network Access Failed.";
                 document.getElementById('auth-status').className = "text-xs text-red-500 mt-4 font-black";
+                window.showToast("Failed to connect. Please make sure Anonymous Sign-in is enabled in Firebase Authentication.", true);
             }
         };
 
